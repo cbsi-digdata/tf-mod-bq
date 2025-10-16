@@ -119,6 +119,16 @@ variable "authorized_datasets" {
   default = []
 }
 
+variable "authorized_routines" {
+  description = "An array of routines to authorize for the dataset"
+  type = list(object({
+    dataset_id = string,
+    project_id = string,
+    routine_id = string
+  }))
+  default = []
+}
+
 variable "tables" {
   description = "A list of objects which include table_id, table_name, schema, clustering, time_partitioning, range_partitioning, expiration_time and labels."
   default     = []

@@ -34,6 +34,7 @@ locals {
   auth_roles    = zipmap(local.auth_role_keys, var.access)
   auth_views    = { for view in var.authorized_views : "${view["project_id"]}_${view["dataset_id"]}_${view["table_id"]}" => view }
   auth_datasets = { for dataset in var.authorized_datasets : "${dataset["project_id"]}_${dataset["dataset_id"]}" => dataset }
+  auth_routines = { for routine in var.authorized_routines : "${routine["project_id"]}_${routine["dataset_id"]}_${routine["routine_id"]}" => routine }
 
   iam_to_primitive = {
     "roles/bigquery.dataOwner" : "OWNER"
@@ -142,6 +143,22 @@ resource "google_bigquery_dataset" "main" {
           dataset_id = access.value.dataset_id
         }
         target_types = ["VIEWS"]
+      }
+    }
+  }
+
+  dynamic "access" {
+    for_each = local.auth_routines
+    content {
+      role           = ""
+      group_by_email = ""
+      user_by_email  = ""
+      special_group  = ""
+      domain         = ""
+      routine {
+        project_id = access.value.project_id
+        dataset_id = access.value.dataset_id
+        routine_id = access.value.routine_id
       }
     }
   }
